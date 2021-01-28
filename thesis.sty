@@ -258,6 +258,8 @@
 
 %% Prikaz pro zadani jmena oponenta, parametry ve tvaru [tituly pred]{Jmeno}{Prijmeni}[tituly za]
 \newcommand\opponent{\def\osoba@{opponent}\futurelet\nextchar\rozbor@jmena}
+%% Prikaz pro zadani jmena druheho oponenta - u doktorských prací
+\newcommand\opponentsec{\def\osoba@{opponentsec}\futurelet\nextchar\rozbor@jmena}
 
 %% Prikaz pro zadani pohlavi autora
 % Ciselna hodnota: 1...zena, 0...muz
@@ -811,6 +813,31 @@ a~som si plne vedom%
       ,~\opponent@za
     \fi
   }%
+  
+%% Vychozi sazba jmena oponenta cislo 2
+\def\@opponentsec
+  {%
+    \ifx\opponentsec@pred\relax\else
+      \opponentsec@pred~%
+    \fi
+    \opponentsec@jmeno{}
+    \opponentsec@prijmeni
+    \ifx\opponentsec@za\relax\else
+      ,~\opponentsec@za
+    \fi
+  }%
+%% Vychozi sazba jmena oponenta velkymi pismeny
+\def\@Opponentsec
+  {%
+    \ifx\opponentsec@pred\relax\else
+      \opponentsec@pred~%
+    \fi
+    \MakeUppercase{\opponentsec@jmeno}
+    \MakeUppercase{\opponentsec@prijmeni}%
+    \ifx\opponentsec@za\relax\else
+      ,~\opponentsec@za
+    \fi
+  }%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -932,9 +959,9 @@ a~som si plne vedom%
       \providecommand\citace@vedouci@czech{Vedouc\'{\i} pr\'{a}ce: \@vedouci}
       \providecommand\citace@vedouci@english{Advised by \@vedouci}%{Supervised by \@vedouci}
       \providecommand\citace@vedouci@slovak{Ved\'{u}ci pr\'{a}ce: \@vedouci}
-      \providecommand\oponenttext@czech{Oponent}
-      \providecommand\oponenttext@english{Opponent}
-      \providecommand\oponenttext@slovak{Oponent}
+      \providecommand\oponenttext@czech{Oponenti}
+      \providecommand\oponenttext@english{Opponents}
+      \providecommand\oponenttext@slovak{Oponenti}
       \providecommand\oznaceniprace@czech{Dizerta\v{c}n\'{\i} pr\'{a}ce} %podle stud. a zkus. radu VUT z 21.7.2011 se to jmenuje "dizertacni" }
       \providecommand\oznaceniprace@english{Doctoral thesis}
       \providecommand\oznaceniprace@slovak{Dizerta\v{c}n\'{a} pr\'{a}ca}
@@ -1327,6 +1354,11 @@ a~som si plne vedom%
 \let\opponent@jmeno=\relax
 \let\opponent@prijmeni=\relax
 \let\opponent@za=\relax
+% jednotlive casti jmena druheho oponenta
+\let\opponentsec@pred=\relax
+\let\opponentsec@jmeno=\relax
+\let\opponentsec@prijmeni=\relax
+\let\opponentsec@za=\relax
 % prikazy pro nastaveni jednotlivych casti jmen
 \def\nastav@tituly@pred[#1]{\expandafter\gdef\csname \osoba@ @pred\endcsname{#1}\futurelet\nextchar\nastav@jmeno}
 \def\nastav@jmeno#1{\expandafter\gdef\csname \osoba@ @jmeno\endcsname{#1}\futurelet\nextchar\test@prijmeni}
@@ -1604,6 +1636,12 @@ a~som si plne vedom%
               \ifx\opponent@prijmeni\relax
             \else
               {\slshape \csname oponenttext@\orig@lang\endcsname :}     & \@Oponent \\%
+              % tady nastane problem, pokud bude nadefinovan pouze jeden oponent a bude to doktorska prace
+              % zobrazi se "Opponents/Oponenti": <jeden oponent>, ale tahle kombinace by nemela nastat
+              \ifx\opponentsec@prijmeni\relax
+              \else
+                & \@Opponentsec \\%
+              \fi
             \fi
           \fi
 
