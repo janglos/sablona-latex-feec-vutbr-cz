@@ -1,0 +1,15 @@
+\documentclass[a4paper]{article}
+
+\usepackage{pdfpages}
+\usepackage[landscape]{geometry}
+
+\begin{document}
+	% the offset parameter can be used to 
+	% compensate printer inaccuracy
+	\includepdf[
+		pages=-,
+		booklet=true,
+		offset=1mm 0]
+			{statement-sablona.pdf}
+	
+\end{document}
