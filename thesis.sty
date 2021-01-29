@@ -73,6 +73,13 @@
     \fi
     \global\let\akt@type=\type@phd
   }%
+\DeclareOption{statement}%sazba tezi (nevim, jestli statement je uplne presne, ale na nic lepsiho jsem neprisel)
+  {%
+    \ifdefined\akt@type
+      \@latex@warning@no@line{Typ prace zmenen na teze/Document type changed to statement}%
+    \fi
+    \global\let\akt@type=\type@statement
+  }%  
 
 %% Zpracovani volby jazyka
 \DeclareOption{czech-english}{% originalnim jazykem je cestina, preklad bude v anglictine
@@ -159,6 +166,7 @@
 \newcount\type@diploma    \type@diploma=2
 \newcount\type@treatise   \type@treatise=3
 \newcount\type@phd        \type@phd=4
+\newcount\type@statement  \type@statement=5
 
 %% Platne jazyky
 \newcount\lang@czech      \lang@czech=0
@@ -968,6 +976,22 @@ a~som si plne vedom%
       \providecommand\vedoucitext@czech{Vedouc\'{\i} pr\'{a}ce}
       \providecommand\vedoucitext@english{Advisor}%{Supervisor}
       \providecommand\vedoucitext@slovak{Ved\'{u}ci pr\'{a}ce}
+    \or %type@statement
+      \providecommand\autortext@czech{Autor pr\'{a}ce}
+      \providecommand\autortext@english{Author}
+      \providecommand\autortext@slovak{Autor pr\'{a}ce}
+      \providecommand\citace@vedouci@czech{\v{S}kolite\q{l}(ka): \@vedouci}
+      \providecommand\citace@vedouci@english{Advised by \@vedouci}%{Supervised by \@vedouci}
+      \providecommand\citace@vedouci@slovak{\v{S}kolite\q{l}(ka): \@vedouci}
+      \providecommand\oponenttext@czech{Oponenti}
+      \providecommand\oponenttext@english{Opponents}
+      \providecommand\oponenttext@slovak{Oponenti}
+      \providecommand\oznaceniprace@czech{Teze diserta\v{c}n\'{\i} pr\'{a}ce}
+      \providecommand\oznaceniprace@english{Doctoral Thesis Statement}
+      \providecommand\oznaceniprace@slovak{Teze diserta\v{c}n\'{\i} pr\'{a}ce}
+      \providecommand\vedoucitext@czech{\v{S}kolite\q{l}(ka)}
+      \providecommand\vedoucitext@english{Advisor}%{Supervisor}
+      \providecommand\vedoucitext@slovak{\v{S}kolite\q{l}(ka)}  
     \else
       \PackageError{thesis}{Nelze najit oznaceni prace pro typ '\akt@type'/Type of thesis '\akt@type' cannot be found}{}
     \fi
@@ -1973,6 +1997,190 @@ a~som si plne vedom%
 
   \newpage
 }}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sazba druhe stranky tezi prikazem \statementscndpg                      %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\statementscndpg{\par
+  \begingroup
+    \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
+    \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
+    \long\def\@makefntext##1{\parindent 1em\noindent
+            \hb@xt@1.8em{%%
+                \hss\@textsuperscript{\normalfont\@thefnmark}}##1}%
+    \if@twocolumn
+      \ifnum \col@number=\@ne
+        \@statementscndpg@vut
+      \else
+        \twocolumn[\@statementscndpg@vut]%
+      \fi
+    \else
+      \newpage
+      \global\@topnum\z@   % Prevents figures from going at top of page.
+      \@statementscndpg@vut
+    \fi
+  \endgroup
+
+  %% Tady si nesmazeme titul
+  \setcounter{footnote}{0}%
+  \global\let\statementscndpg\relax
+  \global\let\@statementscndpg@vut\@empty
+}%
+
+
+\def\@statementscndpg@vut{{% prostredi kvuli pagestyle
+  \renewcommand{\baselinestretch}{1.0}%
+  \pagestyle{empty}%
+  %\cleardoublepage
+  \noindent
+  \parbox{\linewidth}%
+    {
+    \bigskip
+    {%%% prostredi kvuli zmene pisma
+      \large\sffamily\bfseries\MakeUppercase{\keywordsname}%
+    }%%%
+
+    \medskip
+    \parbox{\linewidth}{%%%
+      \sffamily
+      \keywords@orig@lang
+    }%%%
+  }%%
+
+  \bigskip\bigskip
+  \noindent%
+  \rule{\linewidth}{0pt}%
+  \vskip 1em plus 1fill
+
+  {
+  \expandafter\selectlanguage\expandafter{\tran@lang}
+  \noindent
+  \parbox{\linewidth}%
+    {
+    \bigskip
+      {%%% prostredi kvuli zmene pisma
+        \large\sffamily\bfseries\MakeUppercase{\keywordsname}%
+      }%%%
+
+      \medskip
+      \parbox{\linewidth}{%%%
+        \sffamily
+        \keywords@tran@lang
+      }%%%
+    }%%
+  }
+
+  \bigskip\bigskip
+  \noindent%
+  \rule{\linewidth}{0pt}\nopagebreak
+  \vskip 2em plus 2fill
+  %{%% sazba bibliograficke citace
+    %\vspace{\stretch{1}}\noindent
+    %\parbox{\linewidth}{%%%
+      %\sffamily \MakeUppercase{\author@prijmeni},~\author@jmeno{}.
+      %{\slshape \title@orig@lang}.
+      %\@city:
+			%\university@orig@lang,
+      %\faculty@orig@lang,
+      %\department@orig@lang,
+			%\@grade, \pocet@stran~\citace@stran.
+      %{\csname oznaceniprace@\orig@lang\endcsname}.
+      %\csname citace@vedouci@\orig@lang\endcsname
+    %}%%%
+  }%%
+
+  \vspace*{2ex}
+
+  \enlargethispage{1.5\baselineskip}
+  % balicek hyperref predefinovava footnotetext, aby vyzadoval kotvu na footnotemark
+  % nasledujici prikaz docasne obnovi puvodni prikaz footnotetext bez kotvy
+  \def\@footnotetext##1{%
+    \H@@footnotetext{##1}}
+  \footnotetext{%
+    \noindent
+    \hspace*{-6.1mm}%
+    %\hspace*{-\parindent}%
+    %Vysázeno pomocí balíčku \texttt{thesis} verze \fileversion ;
+    Created using \texttt{thesis} version \fileversion ;
+    \url{http://latex.feec.vutbr.cz}
+    }
+
+  \newpage
+}%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Sazba posledni stranky tezi prikazem \statementlstpg                    %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand\statementlstpg{\par
+  \begingroup
+    \renewcommand\thefootnote{\@fnsymbol\c@footnote}%
+    \def\@makefnmark{\rlap{\@textsuperscript{\normalfont\@thefnmark}}}%
+    \long\def\@makefntext##1{\parindent 1em\noindent
+            \hb@xt@1.8em{%%
+                \hss\@textsuperscript{\normalfont\@thefnmark}}##1}%
+    \if@twocolumn
+      \ifnum \col@number=\@ne
+        \@statementlstpg@vut
+      \else
+        \twocolumn[\@statementlstpg@vut]%
+      \fi
+    \else
+      \newpage
+      \global\@topnum\z@   % Prevents figures from going at top of page.
+      \@statementlstpg@vut
+    \fi
+  \endgroup
+
+  %% Tady si nesmazeme titul
+  \setcounter{footnote}{0}%
+  \global\let\vytvorabstrakt\relax
+  \global\let\@vytvorabstrakt@vut\@empty
+}%
+
+
+\def\@statementlstpg@vut{{% prostredi kvuli pagestyle
+  \renewcommand{\baselinestretch}{1.0}%
+  \pagestyle{empty}%
+  %\cleardoublepage
+  \noindent
+  \parbox{\linewidth}%
+    {%% sazba abstraktu v originalnim jazyce
+%  \expandafter\selectlanguage\expandafter{\orig@lang}
+    {%%% prostredi kvuli zmene pisma
+      \large\sffamily\bfseries\MakeUppercase{\abstractname}%
+    }%%%
+
+    \medskip
+    \parbox{\linewidth}{%%%
+      \sffamily
+      \abstract@orig@lang
+    }%%%
+  }%%
+
+  \bigskip\bigskip\bigskip
+  \noindent%
+  \rule{\linewidth}{0pt}%
+  \vskip 5em
+
+  {
+  \expandafter\selectlanguage\expandafter{\tran@lang}
+  \noindent
+  \parbox{\linewidth}%
+    {%% Sazba abstraktu v prekladu
+      {%%%
+        \large\sffamily\bfseries\MakeUppercase{\abstractname}%
+      }%%%
+
+      \medskip
+      \parbox{\linewidth}{%%%
+        \sffamily
+        \abstract@tran@lang
+      }%%%
+    }%%
+  }
+}}%
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Sazba prohlaseni o samostatnosti prace \makedeclaration  %%
