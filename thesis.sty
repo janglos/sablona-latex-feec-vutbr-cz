@@ -1189,6 +1189,17 @@ a~som si plne vedom%
 \renewcommand\thesubparagraph {\alph{subsubsection}.\arabic{paragraph}.\@arabic\c@subparagraph)}
 
 %% Sazba nadpisu kapitoly
+\ifnum\akt@type=\type@statement
+\providecommand\chapter{}
+\renewcommand\chapter
+  {%
+    \@startsection{chapter}{0}{\z@}%
+    {-3.5ex \@plus -1ex \@minus -.2ex}%
+    {2.3ex \@plus.2ex}%   %puvodne2.3ex
+    %{\normalfont\Large\bfseries\MakeUppercase}%
+    {\LARGE\bfseries}%
+  }%
+\else
 \providecommand\chapter{}
 \renewcommand\chapter
   {%
@@ -1198,7 +1209,7 @@ a~som si plne vedom%
     %{\normalfont\Large\bfseries\MakeUppercase}%
     {\LARGE\sffamily\bfseries}%
   }%
-
+\fi
 
 %% Zarovnani rovnic a titulku plovoucich objektu vlevo
 \ifx\akt@center\center@vlevo
